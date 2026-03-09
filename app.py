@@ -26,8 +26,8 @@ font-size:24px;
 """, unsafe_allow_html=True)
 
 # --- SONIDOS ---
-SONIDO_CORRECTO = "https://www.soundjay.com/buttons/sounds/button-4.mp3"
-SONIDO_ERROR = "https://www.soundjay.com/buttons/sounds/button-10.mp3"
+SONIDO_CORRECTO = "https://www.youtube.com/watch?v=1ryberJNjx0"
+SONIDO_ERROR = "https://www.youtube.com/watch?v=R6jTt7mGm8c"
 
 def reproducir_sonido(url):
     st.markdown(f'<audio src="{url}" autoplay></audio>', unsafe_allow_html=True)
