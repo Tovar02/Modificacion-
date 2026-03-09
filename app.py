@@ -26,14 +26,15 @@ font-size:24px;
 """, unsafe_allow_html=True)
 
 # --- SONIDOS ---
-SONIDO_CORRECTO = "https://www.youtube.com/watch?v=1ryberJNjx0"
-SONIDO_ERROR = "https://www.youtube.com/watch?v=R6jTt7mGm8c"
+SONIDO_CORRECTO = "https://www.soundjay.com/buttons/sounds/button-4.mp3"
+SONIDO_ERROR = "https://www.soundjay.com/buttons/sounds/button-10.mp3"
 
 def reproducir_sonido(url):
     st.markdown(f'<audio src="{url}" autoplay></audio>', unsafe_allow_html=True)
 
 # --- PREGUNTAS ---
 if 'pool_preguntas' not in st.session_state:
+
     st.session_state.pool_preguntas = [
 
         {"p": "¿Qué significa TDA?",
@@ -59,6 +60,7 @@ if 'pool_preguntas' not in st.session_state:
         {"p": "¿Qué animal es la mascota de Linux?",
          "o": ["Gato", "Pingüino", "Perro", "Elefante"],
          "c": "Pingüino"}
+
     ]
 
     random.shuffle(st.session_state.pool_preguntas)
@@ -70,6 +72,7 @@ if 'indice' not in st.session_state:
     st.session_state.juego_terminado = False
     st.session_state.tiempo_inicio = time.time()
     st.session_state.resultado = None
+    st.session_state.esperando_resultado = False
 
 TOTAL_PREGUNTAS = 5
 TIEMPO_LIMITE = 60
@@ -100,12 +103,15 @@ if not st.session_state.juego_terminado:
         time.sleep(2)
 
         if st.session_state.indice < TOTAL_PREGUNTAS - 1:
+
             st.session_state.indice += 1
             st.session_state.tiempo_inicio = time.time()
-            st.rerun()
+
         else:
+
             st.session_state.juego_terminado = True
-            st.rerun()
+
+        st.rerun()
 
     # --- PREGUNTA ---
     st.markdown(
@@ -132,24 +138,32 @@ if not st.session_state.juego_terminado:
     if btn_c: seleccion = opciones[2]
     if btn_d: seleccion = opciones[3]
 
-    # --- GUARDAR RESPUESTA ---
-    if seleccion and st.session_state.resultado is None:
+    # --- REGISTRAR RESPUESTA ---
+    if seleccion and not st.session_state.esperando_resultado:
 
         if seleccion == pregunta_actual['c']:
+
             st.session_state.resultado = ("correcto", pregunta_actual['c'])
             st.session_state.puntos += 2
+
         else:
+
             st.session_state.resultado = ("incorrecto", pregunta_actual['c'])
 
+        st.session_state.esperando_resultado = True
+
     # --- MOSTRAR RESULTADO ---
-    if st.session_state.resultado:
+    if st.session_state.esperando_resultado:
 
         tipo, respuesta = st.session_state.resultado
 
         if tipo == "correcto":
+
             reproducir_sonido(SONIDO_CORRECTO)
             st.success("✅ ¡Correcto!")
+
         else:
+
             reproducir_sonido(SONIDO_ERROR)
             st.error(f"❌ Incorrecto. Respuesta: {respuesta}")
 
@@ -159,20 +173,23 @@ if not st.session_state.juego_terminado:
 
             st.session_state.indice += 1
             st.session_state.tiempo_inicio = time.time()
-            st.session_state.resultado = None
-            st.rerun()
 
         else:
 
             st.session_state.juego_terminado = True
-            st.session_state.resultado = None
-            st.rerun()
+
+        st.session_state.resultado = None
+        st.session_state.esperando_resultado = False
+
+        st.rerun()
 
     # --- ACTUALIZAR TEMPORIZADOR ---
-    time.sleep(1)
-    st.rerun()
+    if not st.session_state.esperando_resultado:
 
-# --- FINAL ---
+        time.sleep(1)
+        st.rerun()
+
+# --- FINAL DEL JUEGO ---
 else:
 
     st.header("🏁 Fin del juego")
@@ -180,9 +197,12 @@ else:
     st.metric("PUNTUACIÓN FINAL", f"{st.session_state.puntos} / 10")
 
     if st.session_state.puntos >= 8:
+
         st.balloons()
         st.success("🎉 ¡Eres un experto en TDA!")
+
     else:
+
         st.warning("📚 Sigue estudiando la norma ISDB-Tb")
 
     if st.button("Reintentar"):
@@ -192,6 +212,7 @@ else:
         st.session_state.juego_terminado = False
         st.session_state.tiempo_inicio = time.time()
         st.session_state.resultado = None
+        st.session_state.esperando_resultado = False
 
         random.shuffle(st.session_state.pool_preguntas)
 
