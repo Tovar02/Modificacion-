@@ -2,58 +2,56 @@ import streamlit as st
 import random
 import time
 
-# --- CONFIGURACIÓN DE PÁGINA ---
-st.set_page_config(page_title="¿Quién quiere ser Ingeniero TDA?", page_icon="💰", layout="centered")
+# --- CONFIGURACIÓN ---
+st.set_page_config(page_title="¿Quién quiere ser Ingeniero TDA?", page_icon="💰")
 
-# --- ESTILO VISUAL ---
+# --- ESTILO ---
 st.markdown("""
 <style>
-body {
-    background-color: #0b0c2a;
+.titulo{
+text-align:center;
+color:gold;
+font-size:40px;
 }
 
-.stButton button {
-    height:60px;
-    font-size:18px;
-    border-radius:10px;
-}
-
-.titulo {
-    text-align:center;
-    color:gold;
-    font-size:40px;
-}
-
-.pregunta {
-    background-color:#11144c;
-    padding:20px;
-    border-radius:15px;
-    color:white;
-    text-align:center;
-    font-size:24px;
+.pregunta{
+background-color:#11144c;
+padding:20px;
+border-radius:15px;
+color:white;
+text-align:center;
+font-size:24px;
 }
 </style>
 """, unsafe_allow_html=True)
 
-# --- BASE DE DATOS ---
+# --- PREGUNTAS ---
 if 'pool_preguntas' not in st.session_state:
     st.session_state.pool_preguntas = [
 
-        {"p": "¿Qué significa TDA?", "o": ["Televisión Digital Abierta", "Transmisión Digital Analógica", "Tecnología Digital Avanzada", "Televisión de Alta Definición"], "c": "Televisión Digital Abierta"},
+        {"p": "¿Qué significa TDA?",
+         "o": ["Televisión Digital Abierta", "Transmisión Digital Analógica", "Tecnología Digital Avanzada", "Televisión de Alta Definición"],
+         "c": "Televisión Digital Abierta"},
 
-        {"p": "¿Qué estándar utiliza la TDA en América Latina?", "o": ["DVB-T", "ATSC", "ISDB-Tb", "PAL"], "c": "ISDB-Tb"},
+        {"p": "¿Qué estándar utiliza la TDA en América Latina?",
+         "o": ["DVB-T", "ATSC", "ISDB-Tb", "PAL"],
+         "c": "ISDB-Tb"},
 
-        {"p": "¿Cuál es una ventaja principal de la TDA frente a la televisión analógica?", "o": ["Menor calidad de imagen", "Mayor consumo eléctrico", "Mejor calidad de imagen y sonido", "Menos canales disponibles"], "c": "Mejor calidad de imagen y sonido"},
+        {"p": "¿Cuál es una ventaja de la TDA frente a la televisión analógica?",
+         "o": ["Menor calidad", "Mayor consumo", "Mejor calidad de imagen y sonido", "Menos canales"],
+         "c": "Mejor calidad de imagen y sonido"},
 
-        {"p": "¿Cuántos bits tiene un byte?", "o": ["4", "16", "32", "8"], "c": "8"},
+        {"p": "¿En qué año llegó el hombre a la Luna?",
+         "o": ["1965", "1972", "1969", "1980"],
+         "c": "1969"},
 
-        {"p": "¿Cuál es el lenguaje de programación de esta App?", "o": ["Java", "C++", "Python", "PHP"], "c": "Python"},
+        {"p": "¿Cuántos bits tiene un byte?",
+         "o": ["4", "16", "32", "8"],
+         "c": "8"},
 
-        {"p": "¿Qué animal es la mascota de Linux?", "o": ["Gato", "Pingüino", "Perro", "Elefante"], "c": "Pingüino"},
-
-        {"p": "¿En qué año llegó el hombre a la Luna?", "o": ["1965", "1972", "1969", "1980"], "c": "1969"},
-
-        {"p": "¿Cuál es el río más largo del mundo?", "o": ["Amazonas", "Nilo", "Orinoco", "Misisipi"], "c": "Amazonas"}
+        {"p": "¿Qué animal es la mascota de Linux?",
+         "o": ["Gato", "Pingüino", "Perro", "Elefante"],
+         "c": "Pingüino"}
 
     ]
 
@@ -71,6 +69,7 @@ TIEMPO_LIMITE = 60
 
 # --- TITULO ---
 st.markdown('<div class="titulo">💰 ¿Quién quiere ser Ingeniero TDA?</div>', unsafe_allow_html=True)
+
 st.divider()
 
 # --- BARRA DE PROGRESO ---
@@ -86,22 +85,29 @@ if not st.session_state.juego_terminado:
     tiempo_actual = time.time()
     tiempo_restante = int(TIEMPO_LIMITE - (tiempo_actual - st.session_state.tiempo_inicio))
 
+    timer_placeholder = st.empty()
+    timer_placeholder.metric("Tiempo restante", f"{tiempo_restante} s")
+
     if tiempo_restante <= 0:
-        st.error("⏰ ¡Tiempo agotado!")
+
+        st.error("⏰ Tiempo agotado")
+
         time.sleep(2)
 
         if st.session_state.indice < TOTAL_PREGUNTAS - 1:
+
             st.session_state.indice += 1
             st.session_state.tiempo_inicio = time.time()
             st.rerun()
+
         else:
+
             st.session_state.juego_terminado = True
             st.rerun()
 
-    st.metric("Tiempo restante", f"{tiempo_restante} s")
-
+    # --- PREGUNTA ---
     st.markdown(
-        f'<div class="pregunta">Pregunta {st.session_state.indice + 1}<br><br>{pregunta_actual["p"]}</div>',
+        f'<div class="pregunta">Pregunta {st.session_state.indice+1}<br><br>{pregunta_actual["p"]}</div>',
         unsafe_allow_html=True
     )
 
@@ -127,22 +133,32 @@ if not st.session_state.juego_terminado:
     if seleccion:
 
         if seleccion == pregunta_actual['c']:
-            st.success("✅ ¡Correcto!")
+
+            st.success("✅ Correcto")
             st.session_state.puntos += 2
+
         else:
+
             st.error(f"❌ Incorrecto. Respuesta: {pregunta_actual['c']}")
 
         time.sleep(2)
 
         if st.session_state.indice < TOTAL_PREGUNTAS - 1:
+
             st.session_state.indice += 1
             st.session_state.tiempo_inicio = time.time()
             st.rerun()
+
         else:
+
             st.session_state.juego_terminado = True
             st.rerun()
 
-# --- PANTALLA FINAL ---
+    # --- ACTUALIZAR TEMPORIZADOR ---
+    time.sleep(1)
+    st.rerun()
+
+# --- FINAL DEL JUEGO ---
 else:
 
     st.header("🏁 Fin del juego")
@@ -150,12 +166,15 @@ else:
     st.metric("PUNTUACIÓN FINAL", f"{st.session_state.puntos} / 10")
 
     if st.session_state.puntos >= 8:
+
         st.balloons()
         st.success("🎉 ¡Eres un experto en TDA!")
-    else:
-        st.warning("📚 Sigue estudiando la norma ISDB-Tb.")
 
-    if st.button("🔄 Jugar otra vez"):
+    else:
+
+        st.warning("📚 Sigue estudiando la norma ISDB-Tb")
+
+    if st.button("Reintentar"):
 
         st.session_state.indice = 0
         st.session_state.puntos = 0
