@@ -26,11 +26,11 @@ font-size:24px;
 """, unsafe_allow_html=True)
 
 # --- SONIDOS ---
-SONIDO_CORRECTO = "https://www.soundjay.com/buttons/sounds/button-4.mp3"
+SONIDO_CORRECTO = "https://www.soundjay.com/buttons/sounds/button-09.mp3"
 SONIDO_ERROR = "https://www.soundjay.com/buttons/sounds/button-10.mp3"
 
 def reproducir_sonido(url):
-    st.markdown(f'<audio src="{url}" autoplay></audio>', unsafe_allow_html=True)
+    st.audio(url)
 
 # --- PREGUNTAS ---
 if 'pool_preguntas' not in st.session_state:
@@ -99,16 +99,12 @@ if not st.session_state.juego_terminado:
     if tiempo_restante <= 0:
 
         st.error("⏰ Tiempo agotado")
-
         time.sleep(2)
 
         if st.session_state.indice < TOTAL_PREGUNTAS - 1:
-
             st.session_state.indice += 1
             st.session_state.tiempo_inicio = time.time()
-
         else:
-
             st.session_state.juego_terminado = True
 
         st.rerun()
@@ -142,12 +138,9 @@ if not st.session_state.juego_terminado:
     if seleccion and not st.session_state.esperando_resultado:
 
         if seleccion == pregunta_actual['c']:
-
             st.session_state.resultado = ("correcto", pregunta_actual['c'])
             st.session_state.puntos += 2
-
         else:
-
             st.session_state.resultado = ("incorrecto", pregunta_actual['c'])
 
         st.session_state.esperando_resultado = True
@@ -158,24 +151,18 @@ if not st.session_state.juego_terminado:
         tipo, respuesta = st.session_state.resultado
 
         if tipo == "correcto":
-
-            reproducir_sonido(SONIDO_CORRECTO)
             st.success("✅ ¡Correcto!")
-
+            reproducir_sonido(SONIDO_CORRECTO)
         else:
-
-            reproducir_sonido(SONIDO_ERROR)
             st.error(f"❌ Incorrecto. Respuesta: {respuesta}")
+            reproducir_sonido(SONIDO_ERROR)
 
         time.sleep(2)
 
         if st.session_state.indice < TOTAL_PREGUNTAS - 1:
-
             st.session_state.indice += 1
             st.session_state.tiempo_inicio = time.time()
-
         else:
-
             st.session_state.juego_terminado = True
 
         st.session_state.resultado = None
@@ -185,7 +172,6 @@ if not st.session_state.juego_terminado:
 
     # --- ACTUALIZAR TEMPORIZADOR ---
     if not st.session_state.esperando_resultado:
-
         time.sleep(1)
         st.rerun()
 
@@ -197,12 +183,10 @@ else:
     st.metric("PUNTUACIÓN FINAL", f"{st.session_state.puntos} / 10")
 
     if st.session_state.puntos >= 8:
-
         st.balloons()
         st.success("🎉 ¡Eres un experto en TDA!")
-
+        reproducir_sonido(SONIDO_CORRECTO)
     else:
-
         st.warning("📚 Sigue estudiando la norma ISDB-Tb")
 
     if st.button("Reintentar"):
